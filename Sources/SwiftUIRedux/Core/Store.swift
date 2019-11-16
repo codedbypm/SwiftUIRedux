@@ -14,8 +14,8 @@ public class Store<_Reducer, _Reactor>:
     where
     _Reducer: Reducer,
     _Reactor: Reactor,
-    _Reducer.Mutation == _Reactor.Mutation,
-    _Reactor.Action: CustomStringConvertible
+    _Reducer.Mutation == _Reactor.Mutation
+//    _Reactor.Action: CustomStringConvertible
 {
 
     // MARK: - Public properties

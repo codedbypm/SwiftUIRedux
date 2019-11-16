@@ -10,12 +10,12 @@ import Foundation
 import os.log
 import SwiftUI
 
-enum TextFieldAction {
+public enum TextFieldAction {
     case onTextWillChange(String)
 }
 
 extension TextFieldAction: CustomStringConvertible {
-    var description: String {
+    public var description: String {
         switch self {
         case .onTextWillChange:
             return "onTextWillChange"
@@ -23,13 +23,13 @@ extension TextFieldAction: CustomStringConvertible {
     }
 }
 
-enum TextFieldMutation {
+public enum TextFieldMutation {
     case updateText(String)
 }
 
-struct TextFieldReactor: Reactor {
+public struct TextFieldReactor: Reactor {
 
-    func react(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
+    public func react(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
 
         switch action {
         case .onTextWillChange(let text):
@@ -39,13 +39,13 @@ struct TextFieldReactor: Reactor {
     }
 }
 
-struct TextFieldState {
-    var text: String = ""
+public struct TextFieldState {
+    public var text: String = ""
 }
 
-struct TextFieldReducer: Reducer {
+public struct TextFieldReducer: Reducer {
 
-    func reduce(_ state: inout TextFieldState, mutation: TextFieldMutation) {
+    public func reduce(_ state: inout TextFieldState, mutation: TextFieldMutation) {
         switch mutation {
         case .updateText(let text):
             os_log(.info, log: .redux, "[TextField] Mutation: %@", String(describing: mutation))
@@ -56,7 +56,7 @@ struct TextFieldReducer: Reducer {
 
 extension TextField where Label == Text {
 
-    init(store: Store<TextFieldReducer, TextFieldReactor>) {
+    public init(store: Store<TextFieldReducer, TextFieldReactor>) {
         let binding = Binding<String>(
             get: { store.state.text },
             set: { store.send(.onTextWillChange($0)) }
