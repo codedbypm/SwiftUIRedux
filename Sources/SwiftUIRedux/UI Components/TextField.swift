@@ -39,6 +39,8 @@ public enum TextFieldMutation {
 
 public struct TextFieldReactor: Reactor {
 
+    public init() {}
+
     public func react(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
 
         switch action {
@@ -50,6 +52,8 @@ public struct TextFieldReactor: Reactor {
 }
 
 public struct TextFieldReducer: Reducer {
+
+    public init() {}
 
     public func reduce(_ state: inout TextFieldState, mutation: TextFieldMutation) {
         switch mutation {
