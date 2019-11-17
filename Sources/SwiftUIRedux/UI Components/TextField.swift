@@ -13,7 +13,10 @@ import SwiftUI
 // MARK: - State
 
 public struct TextFieldState {
+
     public var text: String = ""
+
+    public init() {}
 }
 
 // MARK: - Action
