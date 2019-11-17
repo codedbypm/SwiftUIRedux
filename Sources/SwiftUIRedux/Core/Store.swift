@@ -7,30 +7,31 @@
 
 import Combine
 import Foundation
-//import os.log
+import os.log
 
 public class Store<_Reducer, _Reactor>:
     ObservableObject
-    where
+where
     _Reducer: Reducer,
     _Reactor: Reactor,
     _Reducer.Mutation == _Reactor.Mutation
+
 //    _Reactor.Action: CustomStringConvertible
 {
 
     // MARK: - Public properties
 
     public var stateWillChange: AnyPublisher<_Reducer.State, Never> {
-        return _stateWillChangeSubject.eraseToAnyPublisher()
+        return stateWillChangeSubject.eraseToAnyPublisher()
     }
 
     public private(set) var state: _Reducer.State {
-        willSet { _stateWillChangeSubject.send(newValue) }
+        willSet { stateWillChangeSubject.send(newValue) }
     }
 
     // MARK: - Private properties
 
-    private let _stateWillChangeSubject = PassthroughSubject<_Reducer.State, Never>()
+    private let stateWillChangeSubject = PassthroughSubject<_Reducer.State, Never>()
     private var cancellables: Set<AnyCancellable> = []
     private let reducer: _Reducer
     private let reactor: _Reactor
@@ -46,7 +47,7 @@ public class Store<_Reducer, _Reactor>:
     // MARK: - Public methods
 
     public func send(_ action: _Reactor.Action) {
-//        os_log(.info, log: .redux, "[%@] Action: %@", String(describing: self), String(describing: action))
+        os_log(.info, log: .redux, "[%@] Action: %@", String(describing: self), String(describing: action))
         reactor.react(to: action)
             .receive(on: DispatchQueue.main)
             .sink { self.reducer.reduce(&self.state, mutation: $0) }

@@ -10,6 +10,14 @@ import Foundation
 import os.log
 import SwiftUI
 
+// MARK: - State
+
+public struct TextFieldState {
+    public var text: String = ""
+}
+
+// MARK: - Action
+
 public enum TextFieldAction {
     case onTextWillChange(String)
 }
@@ -22,6 +30,8 @@ extension TextFieldAction: CustomStringConvertible {
         }
     }
 }
+
+// MARK: - Mutation
 
 public enum TextFieldMutation {
     case updateText(String)
@@ -37,10 +47,6 @@ public struct TextFieldReactor: Reactor {
             return Just(.updateText(text)).eraseToAnyPublisher()
         }
     }
-}
-
-public struct TextFieldState {
-    public var text: String = ""
 }
 
 public struct TextFieldReducer: Reducer {
