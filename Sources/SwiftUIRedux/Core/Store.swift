@@ -15,23 +15,22 @@ where
     _Reducer: Reducer,
     _Reactor: Reactor,
     _Reducer.Mutation == _Reactor.Mutation
-
 //    _Reactor.Action: CustomStringConvertible
 {
 
     // MARK: - Public properties
-
-    public var stateWillChange: AnyPublisher<_Reducer.State, Never> {
-        return stateWillChangeSubject.eraseToAnyPublisher()
+    
+    public var objectWillChange: AnyPublisher<_Reducer.State, Never> {
+        return objectWillChangeSubject.eraseToAnyPublisher()
     }
 
     public private(set) var state: _Reducer.State {
-        willSet { stateWillChangeSubject.send(newValue) }
+        willSet { objectWillChangeSubject.send(newValue) }
     }
 
     // MARK: - Private properties
 
-    private let stateWillChangeSubject = PassthroughSubject<_Reducer.State, Never>()
+    private let objectWillChangeSubject = PassthroughSubject<_Reducer.State, Never>()
     private var cancellables: Set<AnyCancellable> = []
     private let reducer: _Reducer
     private let reactor: _Reactor
