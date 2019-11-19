@@ -24,7 +24,7 @@ where
         return objectWillChangeSubject.eraseToAnyPublisher()
     }
 
-    public private(set) var state: _Reducer.State {
+    public internal(set) var state: _Reducer.State {
         willSet { objectWillChangeSubject.send(newValue) }
     }
 
