@@ -27,10 +27,6 @@ public class Store<S, A>: ObservableObject {
         self.reducer = reducer
     }
 
-    deinit {
-        print("Deinit")
-    }
-
     // MARK: - Public methods
 
     public func send(_ action: A) {
