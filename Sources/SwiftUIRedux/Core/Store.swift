@@ -36,12 +36,12 @@ public class Store<S, A>: ObservableObject {
     // MARK: - Public methods
 
     public func send(_ action: A) {
-//        os_log(
-//            .info,
-//            log: .redux,
-//            "[%@] Action: %@", String(describing: self), String(describing: action)
-//        )
+        os_log(
+            .info,
+            log: .redux,
+            "[%@] Action: %@", String(describing: self), String(describing: action)
+        )
 
-//        self.reducer(&state, action)
+        self.reducer(&state, action)
     }
 }
