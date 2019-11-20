@@ -39,3 +39,10 @@ public class Store<S, A>: ObservableObject {
         self.reducer(&state, action)
     }
 }
+
+extension Store: CustomStringConvertible {
+
+    public var description: String {
+        return "Store"
+    }
+}
