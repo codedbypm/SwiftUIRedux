@@ -13,23 +13,23 @@ import SwiftUI
 // MARK: - State
 
 public struct TextFieldState {
-
-    public var text: String = ""
-
+    
+    var text: String = ""
+    
     public init() {}
 }
 
 // MARK: - Action
 
 public enum TextFieldAction {
-    case onTextWillChange(String)
+    case update(String)
 }
 
 extension TextFieldAction: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .onTextWillChange:
-            return "onTextWillChange"
+        case .update:
+            return "update"
         }
     }
 }
@@ -37,43 +37,40 @@ extension TextFieldAction: CustomStringConvertible {
 // MARK: - Mutation
 
 public enum TextFieldMutation {
-    case updateText(String)
+    case textDidChange(String)
 }
 
-public struct TextFieldReactor: Reactor {
+public extension TextField {
 
-    public init() {}
-
-    public func react(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
-
-        switch action {
-        case .onTextWillChange(let text):
-            os_log(.info, log: .redux, "[TextField] Reaction: UpdateText")
-            return Just(.updateText(text)).eraseToAnyPublisher()
-        }
-    }
-}
-
-public struct TextFieldReducer: Reducer {
-
-    public init() {}
-
-    public func reduce(_ state: inout TextFieldState, mutation: TextFieldMutation) {
-        switch mutation {
-        case .updateText(let text):
-            os_log(.info, log: .redux, "[TextField] Mutation: %@", String(describing: mutation))
-            state.text = text
+    static var reducer: (inout TextFieldState, TextFieldAction) -> Void {
+        return { state, action in
+            switch action {
+            case .update(let text):
+                state.text = text
+            }
         }
     }
 }
 
 extension TextField where Label == Text {
 
-    public init(store: Store<TextFieldReducer, TextFieldReactor>) {
+    public init(_ placeholder: String? = nil, onTextDidChange: @escaping (String) -> Void) {
+        let store = Store<TextFieldState, TextFieldAction>(
+            state: TextFieldState(),
+            reducer: TextField.reducer
+        )
+
+        _ = store
+            .$state
+            .map { $0.text }
+            .sink(receiveValue: onTextDidChange)
+
         let binding = Binding<String>(
             get: { store.state.text },
-            set: { store.send(.onTextWillChange($0)) }
+            set: { store.send(.update($0)) }
         )
-        self = TextField("placeholder", text: binding)
+
+        let placeholder = placeholder ?? ""
+        self = TextField(placeholder, text: binding)
     }
 }

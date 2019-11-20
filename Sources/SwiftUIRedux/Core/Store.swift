@@ -9,66 +9,39 @@ import Combine
 import Foundation
 import os.log
 
-public class Store<_Reducer, _Reactor>:
-    ObservableObject
-where
-    _Reducer: Reducer,
-    _Reactor: Reactor,
-    _Reducer.Mutation == _Reactor.Mutation
-//    _Reactor.Action: CustomStringConvertible
-{
+public class Store<S, A>: ObservableObject {
+
+    public typealias Reducer = (inout S, A) -> Void
 
     // MARK: - Public properties
-    
-    public var objectWillChange: AnyPublisher<_Reducer.State, Never> {
-        return objectWillChangeSubject.eraseToAnyPublisher()
-    }
 
-    public internal(set) var state: _Reducer.State {
-        willSet { objectWillChangeSubject.send(newValue) }
-    }
+    @Published public var state: S
 
     // MARK: - Private properties
 
-    private let objectWillChangeSubject = PassthroughSubject<_Reducer.State, Never>()
     private var cancellables: Set<AnyCancellable> = []
-    private let reducer: _Reducer
-    private let reactor: _Reactor
+    private let reducer: Reducer
 
     // MARK: - Init
 
-    public init(state: _Reducer.State, reactor: _Reactor, reducer: _Reducer) {
+    public init(state: S, reducer: @escaping Reducer) {
         self.state = state
-        self.reactor = reactor
         self.reducer = reducer
+    }
+
+    deinit {
+        print("Deinit")
     }
 
     // MARK: - Public methods
 
-    public func send(_ action: _Reactor.Action) {
-        os_log(.info, log: .redux, "[%@] Action: %@", String(describing: self), String(describing: action))
-        reactor.react(to: action)
-            .receive(on: DispatchQueue.main)
-            .sink { self.reducer.reduce(&self.state, mutation: $0) }
-            .store(in: &cancellables)
+    public func send(_ action: A) {
+//        os_log(
+//            .info,
+//            log: .redux,
+//            "[%@] Action: %@", String(describing: self), String(describing: action)
+//        )
+
+//        self.reducer(&state, action)
     }
 }
-
-//extension Store: CustomStringConvertible {
-//    public var description: String {
-//        switch _Reactor.self {
-//        case is RootReactor.Type:
-//            return "Root"
-//        case is LoginReactor.Type:
-//            return "Login"
-//        case is UsersReactor.Type:
-//            return "Users"
-//        case is TextFieldReactor.Type:
-//            return "TextField"
-//        default:
-//            assertionFailure("Error: this should not happen")
-//            return ""
-//        }
-//    }
-//}
-//

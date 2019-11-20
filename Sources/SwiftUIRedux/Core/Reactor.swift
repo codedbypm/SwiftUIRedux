@@ -11,6 +11,7 @@ import Combine
 public protocol Reactor {
     associatedtype Action
     associatedtype Mutation
+    associatedtype State
 
-    func react(to _: Action) -> AnyPublisher<Mutation, Never>
+    func react(to _: Action, state: State) -> AnyPublisher<Mutation, Never>
 }
