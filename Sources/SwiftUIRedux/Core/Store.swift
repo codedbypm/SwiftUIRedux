@@ -11,8 +11,6 @@ import os.log
 
 public class Store<S, A>: ObservableObject {
 
-    public typealias Reducer = (inout S, A) -> Void
-
     // MARK: - Public properties
 
     @Published public var state: S
