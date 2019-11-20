@@ -60,11 +60,6 @@ extension TextField where Label == Text {
             reducer: TextField.reducer
         )
 
-        _ = store
-            .$state
-            .map { $0.text }
-            .sink(receiveValue: onTextDidChange)
-
         let binding = Binding<String>(
             get: { store.state.text },
             set: { store.send(.update($0)) }
