@@ -9,20 +9,20 @@ import Combine
 import Foundation
 import os.log
 
-public class Store<S, A>: ObservableObject {
+public class Store<State, A: Action>: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published public var state: S
+    @Published public private(set) var state: State
 
     // MARK: - Private properties
 
     private var cancellables: Set<AnyCancellable> = []
-    private let reducer: Reducer
+    private let reducer: AnyReducer<State, A.Mutation>
 
-    // MARK: - Init
+    // MARK: - Inits
 
-    public init(state: S, reducer: @escaping Reducer) {
+    public init(state: State, reducer: AnyReducer<State, A.Mutation>) {
         self.state = state
         self.reducer = reducer
     }
@@ -36,7 +36,11 @@ public class Store<S, A>: ObservableObject {
             "[%@] Action: %@", String(describing: self), String(describing: action)
         )
 
-        self.reducer(&state, action)
+        action
+            .reaction
+            .receive(on: RunLoop.main)
+            .sink { self.reducer.reduce(&self.state, $0) }
+            .store(in: &cancellables)
     }
 }
 

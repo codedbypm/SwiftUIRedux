@@ -25,6 +25,15 @@ public enum TextFieldAction {
     case update(String)
 }
 
+extension TextFieldAction: Action {
+
+    public var reaction: AnyPublisher<TextFieldMutation, Never> {
+        switch self {
+        case .update(let updatedText):
+            return Just(.textDidChange(updatedText)).eraseToAnyPublisher()
+        }
+    }
+}
 extension TextFieldAction: CustomStringConvertible {
     public var description: String {
         switch self {
@@ -40,14 +49,11 @@ public enum TextFieldMutation {
     case textDidChange(String)
 }
 
-public extension TextField {
-
-    static var reducer: (inout TextFieldState, TextFieldAction) -> Void {
-        return { state, action in
-            switch action {
-            case .update(let text):
-                state.text = text
-            }
+public struct TextFieldReducer: Reducer {
+    public func reduce(state: inout TextFieldState, mutation: TextFieldMutation) {
+        switch mutation {
+        case .textDidChange(let text):
+            state.text = text
         }
     }
 }
@@ -57,7 +63,7 @@ extension TextField where Label == Text {
     public init(_ placeholder: String? = nil, onTextDidChange: @escaping (String) -> Void) {
         let store = Store<TextFieldState, TextFieldAction>(
             state: TextFieldState(),
-            reducer: TextField.reducer
+            reducer: TextFieldReducer().eraseToAnyReducer()
         )
 
         let binding = Binding<String>(
