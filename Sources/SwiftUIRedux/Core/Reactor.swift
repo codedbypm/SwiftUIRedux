@@ -8,8 +8,9 @@
 import Combine
 import Foundation
 
-public protocol Action {
+public protocol Reactor {
+    associatedtype Action
     associatedtype Mutation
 
-    var reaction: AnyPublisher<Mutation, Never> { get }
+    func reaction(for: Action) -> AnyPublisher<Mutation, Never>
 }
