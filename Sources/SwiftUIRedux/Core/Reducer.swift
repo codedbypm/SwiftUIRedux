@@ -12,7 +12,7 @@ public protocol Reducer {
     func reduce(state: inout State, mutation: Mutation)
 }
 
-extension Reducer {
+public extension Reducer {
 
     func eraseToAnyReducer() -> AnyReducer<State, Mutation> {
         return AnyReducer(reducer: self)
