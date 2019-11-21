@@ -36,19 +36,12 @@ public final class Store<State, R: Reactor>: ObservableObject {
         os_log(
             .info,
             log: .redux,
-            "[%@] Action: %@", String(describing: self), String(describing: action)
+            "Action: %@", String(describing: action)
         )
 
         reactor.reaction(for: action)
             .receive(on: RunLoop.main)
             .sink { self.reducer.reduce(&self.state, $0) }
             .store(in: &cancellables)
-    }
-}
-
-extension Store: CustomStringConvertible {
-
-    public var description: String {
-        return "Store"
     }
 }
