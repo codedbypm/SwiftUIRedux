@@ -17,7 +17,8 @@ public class Store<State, A: Action>: ObservableObject {
 
     // MARK: - Private properties
 
-    private var cancellables: Set<AnyCancellable> = []
+//    public private(set) var cancellables = Set<AnyCancellable>()
+
     private let reducer: AnyReducer<State, A.Mutation>
 
     // MARK: - Inits
@@ -36,11 +37,15 @@ public class Store<State, A: Action>: ObservableObject {
             "[%@] Action: %@", String(describing: self), String(describing: action)
         )
 
-        action
-            .reaction
-            .receive(on: RunLoop.main)
-            .sink { self.reducer.reduce(&self.state, $0) }
-            .store(in: &cancellables)
+        let publisher = action.reaction.sink { mutation in
+            print(mutation)
+        }
+
+//        action
+//            .reaction
+//            .receive(on: RunLoop.main)
+//            .sink { self.reducer.reduce(&self.state, $0) }
+//            .store(in: &cancellables)
     }
 }
 
