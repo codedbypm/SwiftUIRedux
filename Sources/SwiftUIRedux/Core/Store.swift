@@ -9,22 +9,22 @@ import Combine
 import Foundation
 import os.log
 
-public final class Store<State, R: Reactor>: ObservableObject {
+public final class Store<R: Reactor>: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published public private(set) var state: State
+    @Published public private(set) var state: R.State
 
     // MARK: - Private properties
 
     public private(set) var cancellables = Set<AnyCancellable>()
 
-    private let reducer: AnyReducer<State, R.Mutation>
+    private let reducer: AnyReducer<R.State, R.Mutation>
     private let reactor: R
 
     // MARK: - Inits
 
-    public init(state: State, reactor: R, reducer: AnyReducer<State, R.Mutation>) {
+    public init(state: R.State, reactor: R, reducer: AnyReducer<R.State, R.Mutation>) {
         self.state = state
         self.reactor = reactor
         self.reducer = reducer
@@ -39,7 +39,7 @@ public final class Store<State, R: Reactor>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        reactor.reaction(for: action)
+        reactor.reaction(for: action, state: state)
             .receive(on: RunLoop.main)
             .sink { self.reducer.reduce(&self.state, $0) }
             .store(in: &cancellables)

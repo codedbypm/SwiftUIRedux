@@ -51,7 +51,7 @@ public struct TextFieldReducer: Reducer {
 
 public class TextFieldReactor: Reactor {
 
-    public func reaction(for action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
+    public func reaction(for action: TextFieldAction, state: TextFieldState) -> AnyPublisher<TextFieldMutation, Never> {
         switch action {
         case .update(let updatedtText):
             return Just(.textDidChange(updatedtText)).eraseToAnyPublisher()
@@ -62,7 +62,7 @@ public class TextFieldReactor: Reactor {
 extension TextField where Label == Text {
 
     public init(_ placeholder: String? = nil, onTextDidChange: @escaping (String) -> Void) {
-        let store = Store<TextFieldState, TextFieldReactor>(
+        let store = Store(
             state: TextFieldState(),
             reactor: TextFieldReactor(),
             reducer: TextFieldReducer().eraseToAnyReducer()

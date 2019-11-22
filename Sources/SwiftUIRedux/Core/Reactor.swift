@@ -11,6 +11,7 @@ import Foundation
 public protocol Reactor {
     associatedtype Action
     associatedtype Mutation
-
-    func reaction(for: Action) -> AnyPublisher<Mutation, Never>
+    associatedtype State
+    
+    func reaction(for: Action, state: State) -> AnyPublisher<Mutation, Never>
 }
