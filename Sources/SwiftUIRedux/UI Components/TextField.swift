@@ -42,9 +42,12 @@ public enum TextFieldMutation {
 
 // MARK: - Reactor
 
-extension TextField where Label == Text {
+extension Reactors {
 
-    public static func reactor(for action: TextFieldAction, state: TextFieldState) -> AnyPublisher<TextFieldMutation, Never> {
+    public static func textFieldReactor(
+        for action: TextFieldAction,
+        state: TextFieldState
+    ) -> AnyPublisher<TextFieldMutation, Never> {
         switch action {
         case .update(let updatedtText):
             return Just(.textDidChange(updatedtText)).eraseToAnyPublisher()
@@ -54,9 +57,9 @@ extension TextField where Label == Text {
 
 // MARK: - Reducer
 
-extension TextField where Label == Text {
+extension Reducers {
 
-    public static func reducer(state: inout TextFieldState, mutation: TextFieldMutation) {
+    public static func textFieldReducer(state: inout TextFieldState, mutation: TextFieldMutation) {
         switch mutation {
         case .textDidChange(let text):
             state.text = text
@@ -71,8 +74,8 @@ extension TextField where Label == Text {
     public static func store() -> Store<TextFieldState, TextFieldAction, TextFieldMutation> {
         return Store(
             state: TextFieldState(),
-            reactor: TextField.reactor,
-            reducer: TextField.reducer
+            reactor: Reactors.textFieldReactor,
+            reducer: Reducers.textFieldReducer
         )
     }
 }
