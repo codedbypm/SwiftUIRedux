@@ -9,8 +9,6 @@ import Combine
 import Foundation
 import os.log
 
-public typealias Reactor<State, Action, Mutation> = (Action, State) -> AnyPublisher<Mutation, Never>
-
 public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
