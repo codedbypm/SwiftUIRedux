@@ -20,7 +20,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
     public private(set) var cancellables = Set<AnyCancellable>()
 
     public let reducer: Reducer<State, Mutation>
-    private let reactor: Reactor<State, Action, Mutation>
+    public let reactor: Reactor<State, Action, Mutation>
 
     // MARK: - Inits
 
