@@ -9,22 +9,30 @@ import Combine
 import Foundation
 import os.log
 
-public final class Store<R: Reactor>: ObservableObject {
+public typealias Reactor<State, Action, Mutation> = (Action, State) -> AnyPublisher<Mutation, Never>
+
+public typealias Reducer<State, Mutation> = (inout State, Mutation) -> Void
+
+public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published public private(set) var state: R.State
+    @Published public private(set) var state: State
 
     // MARK: - Private properties
 
     public private(set) var cancellables = Set<AnyCancellable>()
 
-    public let reducer: AnyReducer<R.State, R.Mutation>
-    private let reactor: R
+    public let reducer: Reducer<State, Mutation>
+    private let reactor: Reactor<State, Action, Mutation>
 
     // MARK: - Inits
 
-    public init(state: R.State, reactor: R, reducer: AnyReducer<R.State, R.Mutation>) {
+    public init(
+        state: State,
+        reactor: @escaping Reactor<State, Action, Mutation>,
+        reducer: @escaping Reducer<State, Mutation>
+    ) {
         self.state = state
         self.reactor = reactor
         self.reducer = reducer
@@ -32,16 +40,16 @@ public final class Store<R: Reactor>: ObservableObject {
 
     // MARK: - Public methods
 
-    public func send(_ action: R.Action) {
+    public func send(_ action: Action) {
         os_log(
             .info,
             log: .redux,
             "Action: %@", String(describing: action)
         )
 
-        reactor.reaction(for: action, state: state)
+        reactor(action, state)
             .receive(on: RunLoop.main)
-            .sink { self.reducer.reduce(&self.state, $0) }
+            .sink { self.reducer(&self.state, $0) }
             .store(in: &cancellables)
     }
 }

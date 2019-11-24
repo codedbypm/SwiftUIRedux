@@ -40,18 +40,11 @@ public enum TextFieldMutation {
     case textDidChange(String)
 }
 
-public struct TextFieldReducer: Reducer {
-    public func reduce(state: inout TextFieldState, mutation: TextFieldMutation) {
-        switch mutation {
-        case .textDidChange(let text):
-            state.text = text
-        }
-    }
-}
+// MARK: - Reactor
 
-public class TextFieldReactor: Reactor {
+extension TextField where Label == Text {
 
-    public func reaction(for action: TextFieldAction, state: TextFieldState) -> AnyPublisher<TextFieldMutation, Never> {
+    public static func reactor(for action: TextFieldAction, state: TextFieldState) -> AnyPublisher<TextFieldMutation, Never> {
         switch action {
         case .update(let updatedtText):
             return Just(.textDidChange(updatedtText)).eraseToAnyPublisher()
@@ -59,15 +52,35 @@ public class TextFieldReactor: Reactor {
     }
 }
 
+// MARK: - Reducer
+
+extension TextField where Label == Text {
+
+    public static func reducer(state: inout TextFieldState, mutation: TextFieldMutation) {
+        switch mutation {
+        case .textDidChange(let text):
+            state.text = text
+        }
+    }
+}
+
+// MARK: - Store
+
+extension TextField where Label == Text {
+
+    public static func store() -> Store<TextFieldState, TextFieldAction, TextFieldMutation> {
+        return Store(
+            state: TextFieldState(),
+            reactor: TextField.reactor,
+            reducer: TextField.reducer
+        )
+    }
+}
+
 extension TextField where Label == Text {
 
     public init(_ placeholder: String? = nil, onTextDidChange: @escaping (String) -> Void) {
-        let store = Store(
-            state: TextFieldState(),
-            reactor: TextFieldReactor(),
-            reducer: TextFieldReducer().eraseToAnyReducer()
-
-        )
+        let store = Self.store()
 
         let binding = Binding<String>(
             get: { store.state.text },
