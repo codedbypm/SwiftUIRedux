@@ -11,8 +11,6 @@ import os.log
 
 public typealias Reactor<State, Action, Mutation> = (Action, State) -> AnyPublisher<Mutation, Never>
 
-public typealias Reducer<State, Mutation> = (inout State, Mutation) -> Void
-
 public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
