@@ -38,8 +38,8 @@ extension TextFieldAction: CustomStringConvertible {
 
 extension StoreControllers {
 
-    public static var textFieldStoreController: StoreController<TextFieldAction, TextFieldMutation> {
-        return { action in
+    public static var textFieldStoreController: StoreController<TextFieldState, TextFieldAction, TextFieldMutation> {
+        return { action, _  in
             switch action {
             case .update(let text):
                 return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()

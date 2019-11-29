@@ -21,14 +21,14 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
     public let reducer: Reducer<State, Mutation>
 
-    private let controller: StoreController<Action, Mutation>
+    private let controller: StoreController<State, Action, Mutation>
 
     // MARK: - Inits
 
     public init(
         state: State,
         reducer: @escaping Reducer<State, Mutation>,
-        controller: @escaping StoreController<Action, Mutation>
+        controller: @escaping StoreController<State, Action, Mutation>
     ) {
         self.state = state
         self.reducer = reducer
@@ -44,7 +44,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        controller(action)
+        controller(action, state)
             .receive(on: RunLoop.main)
             .sink { self.reducer(&self.state, $0) }
             .store(in: &cancellables)
