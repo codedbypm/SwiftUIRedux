@@ -36,15 +36,17 @@ extension TextFieldAction: CustomStringConvertible {
 
 // MARK: - StoreController
 
-public struct TextFieldStoreController: StoreController {
-    public func storeResponse(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
-        switch action {
-        case .update(let text):
-            return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()
+extension StoreControllers {
+
+    public static var textFieldStoreController: StoreController<TextFieldAction, TextFieldMutation> {
+        return { action in
+            switch action {
+            case .update(let text):
+                return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()
+            }
         }
     }
 }
-
 // MARK: - Mutation
 
 public enum TextFieldMutation {
@@ -67,11 +69,11 @@ extension Reducers {
 
 extension TextField where Label == Text {
 
-    public static func store() -> Store<TextFieldState, TextFieldStoreController> {
+    public static func store() -> Store<TextFieldState, TextFieldAction, TextFieldMutation> {
         return Store(
             state: TextFieldState(),
             reducer: Reducers.textFieldReducer,
-            controller: TextFieldStoreController()
+            controller: StoreControllers.textFieldStoreController
         )
     }
 }

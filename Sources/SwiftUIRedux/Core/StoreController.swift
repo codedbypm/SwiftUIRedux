@@ -8,12 +8,17 @@
 import Combine
 import Foundation
 
-public protocol StoreController {
-    associatedtype Action
-    associatedtype Mutation
-
-    func storeResponse(to action: Action) -> AnyPublisher<Mutation, Never>
-}
+public typealias StoreController<Action, Mutation> = (Action) -> AnyPublisher<Mutation, Never>
 
 public enum StoreControllers {
 }
+
+//public protocol StoreController {
+//    associatedtype Action
+//    associatedtype Mutation
+//
+//    func storeResponse(to action: Action) -> AnyPublisher<Mutation, Never>
+//}
+//
+//public enum StoreControllers {
+//}
