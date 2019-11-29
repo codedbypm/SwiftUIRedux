@@ -14,3 +14,6 @@ public protocol StoreController {
 
     func storeResponse(to action: Action) -> AnyPublisher<Mutation, Never>
 }
+
+public enum StoreControllers {
+}
