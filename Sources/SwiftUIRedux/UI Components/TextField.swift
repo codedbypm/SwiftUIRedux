@@ -37,10 +37,10 @@ extension TextFieldAction: CustomStringConvertible {
 // MARK: - StoreController
 
 public struct TextFieldStoreController: StoreController {
-    public func storeResponse(to action: TextFieldAction) -> Future<TextFieldMutation, Never> {
+    public func storeResponse(to action: TextFieldAction) -> AnyPublisher<TextFieldMutation, Never> {
         switch action {
         case .update(let text):
-            return Future { $0(.success(.textDidChange(text))) }
+            return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()
         }
     }
 }

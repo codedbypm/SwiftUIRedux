@@ -12,5 +12,5 @@ public protocol StoreController {
     associatedtype Action
     associatedtype Mutation
 
-    func storeResponse(to action: Action) -> Future<Mutation, Never>
+    func storeResponse(to action: Action) -> AnyPublisher<Mutation, Never>
 }
