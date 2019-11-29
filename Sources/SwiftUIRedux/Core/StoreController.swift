@@ -8,9 +8,9 @@
 import Combine
 import Foundation
 
-public protocol Effect {
-    associatedtype State
+public protocol StoreController {
+    associatedtype Action
     associatedtype Mutation
 
-    func reaction(state: State) -> AnyPublisher<Mutation, Never>
+    func storeResponse(to action: Action) -> Future<Mutation, Never>
 }

@@ -25,20 +25,22 @@ public enum TextFieldAction {
     case update(String)
 }
 
-extension TextFieldAction: Effect {
-    public func reaction(state: TextFieldState) -> AnyPublisher<TextFieldMutation, Never> {
-        switch self {
-        case .update(let text):
-            return Just(.textDidChange(text)).eraseToAnyPublisher()
-        }
-    }
-}
-
 extension TextFieldAction: CustomStringConvertible {
     public var description: String {
         switch self {
         case .update:
             return "update"
+        }
+    }
+}
+
+// MARK: - StoreController
+
+public struct TextFieldStoreController: StoreController {
+    public func storeResponse(to action: TextFieldAction) -> Future<TextFieldMutation, Never> {
+        switch action {
+        case .update(let text):
+            return Future { $0(.success(.textDidChange(text))) }
         }
     }
 }
@@ -65,10 +67,11 @@ extension Reducers {
 
 extension TextField where Label == Text {
 
-    public static func store() -> Store<TextFieldState, TextFieldAction> {
+    public static func store() -> Store<TextFieldState, TextFieldStoreController> {
         return Store(
             state: TextFieldState(),
-            reducer: Reducers.textFieldReducer
+            reducer: Reducers.textFieldReducer,
+            controller: TextFieldStoreController()
         )
     }
 }
