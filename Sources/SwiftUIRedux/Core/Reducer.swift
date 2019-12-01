@@ -7,36 +7,39 @@
 
 import Foundation
 
-public typealias Reducer<State, Mutation> = (inout State, Mutation) -> Void
-
-public enum Reducers {
+public struct Reducer<State, Mutation> {
+    let reduce: (inout State, Mutation) -> Void
 }
 
-public extension Reducers {
+public extension Reducer {
 
     /// This function enables `pulling back` a reducer, i.e. expressing a more local reducer using a broader higher
     /// level reducer.
-    ///
-    /// Since a `Reducer` is generic compared to the `State` and `Mutation`, the pullback function accepts two
-    /// extra parameters which describe the conversion to apply when expressing the `LocalState` using `State`
-    /// and the `LocalMutation` using a `Mutation`.
     ///
     /// - Parameters:
     ///   - localReducer: the reducer operating on a local context
     ///   - stateKeyPath: the transformation to follow when going from `State` to `LocalState`
     ///   - mutationKeyPath: the transformation to follow when going from `Mutation` to `LocalMutation`
-    static func pullback<LocalState, LocalMutation, State, Mutation>(
-        _ localReducer: @escaping Reducer<LocalState, LocalMutation>,
-        stateKeyPath: WritableKeyPath<State, LocalState>,
-        mutationKeyPath: KeyPath<Mutation, LocalMutation?>
-    ) -> Reducer<State, Mutation> {
+    func pullback<ToState, ToMutation>(
+        stateKeyPath: WritableKeyPath<ToState, State>,
+        mutationKeyPath: KeyPath<ToMutation, Mutation?>
+    ) -> Reducer<ToState, ToMutation> {
 
-        return { state, mutation in
-            guard let localMutation = mutation[keyPath: mutationKeyPath] else { return }
+        return .init { toState, toMutation in
+            guard let fromMutation = toMutation[keyPath: mutationKeyPath] else { return }
 
-            var localState = state[keyPath: stateKeyPath]
-            localReducer(&localState, localMutation)
-            state[keyPath: stateKeyPath] = localState
+            var fromState = toState[keyPath: stateKeyPath]
+            self.reduce(&fromState, fromMutation)
+            toState[keyPath: stateKeyPath] = fromState
+        }
+    }
+
+    func push<ToState, ToMutation>(
+        stateKeyPath: WritableKeyPath<ToState, State>
+    ) -> Reducer<ToState, ToMutation> {
+
+        return .init { toState, toMutation in
+
         }
     }
 
@@ -46,9 +49,9 @@ public extension Reducers {
     static func combine<State, Mutation>(
         _ reducers: [Reducer<State, Mutation>]
     ) -> Reducer<State, Mutation> {
-        return { state, mutation in
+        return .init { (state, mutation) in
             reducers.forEach {
-                $0(&state, mutation)
+                $0.reduce(&state, mutation)
             }
         }
     }

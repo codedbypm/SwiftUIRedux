@@ -27,8 +27,8 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
     public init(
         state: State,
-        reducer: @escaping Reducer<State, Mutation>,
-        controller: @escaping StoreController<State, Action, Mutation>
+        reducer: Reducer<State, Mutation>,
+        controller: StoreController<State, Action, Mutation>
     ) {
         self.state = state
         self.reducer = reducer
@@ -44,9 +44,9 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        controller(action, state)
+        controller.process(action, state)
             .receive(on: RunLoop.main)
-            .sink { self.reducer(&self.state, $0) }
+            .sink { self.reducer.reduce(&self.state, $0) }
             .store(in: &cancellables)
     }
 }

@@ -36,10 +36,11 @@ extension TextFieldAction: CustomStringConvertible {
 
 // MARK: - StoreController
 
-extension StoreControllers {
+extension StoreController {
 
-    public static var textFieldStoreController: StoreController<TextFieldState, TextFieldAction, TextFieldMutation> {
-        return { action, _  in
+    public static func textFieldStoreController(
+    ) -> StoreController<TextFieldState, TextFieldAction, TextFieldMutation> {
+        return .init { action, _  in
             switch action {
             case .update(let text):
                 return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()
@@ -55,12 +56,14 @@ public enum TextFieldMutation {
 
 // MARK: - Reducer
 
-extension Reducers {
+extension Reducer {
 
-    public static func textFieldReducer(state: inout TextFieldState, mutation: TextFieldMutation) {
-        switch mutation {
-        case .textDidChange(let text):
-            state.text = text
+    public static func textFieldReducer() -> Reducer<TextFieldState, TextFieldMutation> {
+        return .init { state, mutation in
+            switch mutation {
+            case .textDidChange(let text):
+                state.text = text
+            }
         }
     }
 }
@@ -69,18 +72,22 @@ extension Reducers {
 
 extension TextField where Label == Text {
 
-    public static func store() -> Store<TextFieldState, TextFieldAction, TextFieldMutation> {
+    public static func store(
+    ) -> Store<TextFieldState, TextFieldAction, TextFieldMutation> {
         return Store(
             state: TextFieldState(),
-            reducer: Reducers.textFieldReducer,
-            controller: StoreControllers.textFieldStoreController
+            reducer: .textFieldReducer(),
+            controller: .textFieldStoreController()
         )
     }
 }
 
 extension TextField where Label == Text {
 
-    public init(_ placeholder: String? = nil, onTextDidChange: @escaping (String) -> Void) {
+    public init(
+        _ placeholder: String? = nil,
+        onTextDidChange: @escaping (String) -> Void
+    ) {
         let store = Self.store()
 
         let binding = Binding<String>(

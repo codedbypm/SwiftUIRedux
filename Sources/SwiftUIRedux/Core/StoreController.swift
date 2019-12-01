@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-public typealias StoreController<State, Action, Mutation> = (Action, State) -> AnyPublisher<Mutation, Never>
-
-public enum StoreControllers {
+public struct StoreController<State, Action, Mutation> {
+    let process: (Action, State) -> AnyPublisher<Mutation, Never>
 }
+
