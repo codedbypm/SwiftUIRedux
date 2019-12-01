@@ -14,7 +14,6 @@ public enum Reducers {
 
 public extension Reducers {
 
-
     /// This function enables `pulling back` a reducer, i.e. expressing a more local reducer using a broader higher
     /// level reducer.
     ///
@@ -40,7 +39,6 @@ public extension Reducers {
             state[keyPath: stateKeyPath] = localState
         }
     }
-
 
     /// A function that combines an array of `Reducer` instances in one single `Reducer`
     ///
