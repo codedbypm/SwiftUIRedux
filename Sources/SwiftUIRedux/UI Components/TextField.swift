@@ -43,7 +43,9 @@ extension StoreController {
         return .init { action, _  in
             switch action {
             case .update(let text):
-                return Future { $0(.success(.textDidChange(text))) }.eraseToAnyPublisher()
+                return
+                    Future { $0(.success(.textDidChange(text))) }
+                    .eraseToAnyPublisher()
             }
         }
     }
