@@ -9,7 +9,7 @@ import Combine
 import Foundation
 
 public struct StoreController<State, Action, Mutation> {
-    let process: (Action, State) -> AnyPublisher<Mutation, Never>
+    public let process: (Action, State) -> AnyPublisher<Mutation, Never>
 
     public init(process: @escaping (Action, State) -> AnyPublisher<Mutation, Never>) {
         self.process = process
