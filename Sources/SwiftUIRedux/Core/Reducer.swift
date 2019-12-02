@@ -9,6 +9,10 @@ import Foundation
 
 public struct Reducer<State, Mutation> {
     let reduce: (inout State, Mutation) -> Void
+
+    public init(reduce: @escaping (inout State, Mutation) -> Void) {
+        self.reduce = reduce
+    }
 }
 
 public extension Reducer {
