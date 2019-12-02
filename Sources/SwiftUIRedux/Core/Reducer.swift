@@ -20,7 +20,7 @@ public extension Reducer {
     ///   - localReducer: the reducer operating on a local context
     ///   - stateKeyPath: the transformation to follow when going from `State` to `LocalState`
     ///   - mutationKeyPath: the transformation to follow when going from `Mutation` to `LocalMutation`
-    func pullback<ToState, ToMutation>(
+    func pullBack<ToState, ToMutation>(
         stateKeyPath: WritableKeyPath<ToState, State>,
         mutationKeyPath: KeyPath<ToMutation, Mutation?>
     ) -> Reducer<ToState, ToMutation> {
@@ -31,15 +31,6 @@ public extension Reducer {
             var fromState = toState[keyPath: stateKeyPath]
             self.reduce(&fromState, fromMutation)
             toState[keyPath: stateKeyPath] = fromState
-        }
-    }
-
-    func push<ToState, ToMutation>(
-        stateKeyPath: WritableKeyPath<ToState, State>
-    ) -> Reducer<ToState, ToMutation> {
-
-        return .init { toState, toMutation in
-
         }
     }
 
