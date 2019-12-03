@@ -16,3 +16,10 @@ public struct StoreController<State, Action, Mutation> {
     }
 }
 
+public protocol StoreControllerProtocol {
+    associatedtype A
+    associatedtype S
+    associatedtype M
+
+    func process(_ action: A, _ state: S) -> AnyPublisher<M, Never>
+}
