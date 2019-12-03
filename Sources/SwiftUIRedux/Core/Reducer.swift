@@ -50,4 +50,14 @@ public extension Reducer {
             }
         }
     }
+
+    static func combine<State, Mutation>(
+        _ reducers: [(inout State, Mutation) -> Void]
+    ) -> (inout State, Mutation) -> Void {
+        return { (state, mutation) in
+            reducers.forEach {
+                $0(&state, mutation)
+            }
+        }
+    }
 }
