@@ -52,17 +52,16 @@ public func pullback<LocalState, GlobalState, LocalMutation, GlobalMutation>(
 }
 
 public func pullback<LocalAction, LocalState, LocalMutation, GlobalAction, GlobalState, GlobalMutation>(
-    _ localStoreController: StoreController<LocalState, LocalAction, LocalMutation>,
+    _ localStoreController: @escaping (LocalAction, LocalState) -> AnyPublisher<LocalMutation, Never>,
     _ stateKeyPath: WritableKeyPath<GlobalState, LocalState>,
     _ actionKeyPath: KeyPath<GlobalAction, LocalAction?>,
     _ mutationMapper: @escaping (LocalMutation) -> GlobalMutation
-) -> StoreController<GlobalState, GlobalAction, GlobalMutation> {
-    return StoreController { action, state in
+) -> (GlobalAction, GlobalState) -> AnyPublisher<GlobalMutation, Never> {
+    return { action, state in
         guard let localAction = action[keyPath: actionKeyPath] else { fatalError() }
 
         let localState = state[keyPath: stateKeyPath]
-        return localStoreController
-            .process(localAction, localState)
+        return localStoreController(localAction, localState)
             .map { mutationMapper($0) }
             .eraseToAnyPublisher()
     }
