@@ -58,7 +58,9 @@ public func pullback<LocalAction, LocalState, LocalMutation, GlobalAction, Globa
     _ mutationMapper: @escaping (LocalMutation) -> GlobalMutation
 ) -> (GlobalAction, GlobalState) -> AnyPublisher<GlobalMutation, Never> {
     return { action, state in
-        guard let localAction = action[keyPath: actionKeyPath] else { fatalError() }
+        guard let localAction = action[keyPath: actionKeyPath] else {
+            return Empty<GlobalMutation, Never>(completeImmediately: false).eraseToAnyPublisher()
+        }
 
         let localState = state[keyPath: stateKeyPath]
         return localStoreController(localAction, localState)
