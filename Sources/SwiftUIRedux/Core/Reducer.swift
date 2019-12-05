@@ -50,3 +50,20 @@ public func pullback<LocalState, GlobalState, LocalMutation, GlobalMutation>(
         reducer(&state[keyPath: stateKeyPath], localMutation)
     }
 }
+
+public func pullback<LocalAction, LocalState, LocalMutation, GlobalAction, GlobalState, GlobalMutation>(
+    _ localStoreController: StoreController<LocalState, LocalAction, LocalMutation>,
+    _ stateKeyPath: WritableKeyPath<GlobalState, LocalState>,
+    _ actionKeyPath: KeyPath<GlobalAction, LocalAction?>,
+    _ mutationMapper: @escaping (LocalMutation) -> GlobalMutation
+) -> StoreController<GlobalState, GlobalAction, GlobalMutation> {
+    return StoreController { action, state in
+        guard let localAction = action[keyPath: actionKeyPath] else { fatalError() }
+
+        let localState = state[keyPath: stateKeyPath]
+        return localStoreController
+            .process(localAction, localState)
+            .map { mutationMapper($0) }
+            .eraseToAnyPublisher()
+    }
+}
