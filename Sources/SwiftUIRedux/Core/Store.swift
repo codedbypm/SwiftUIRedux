@@ -50,3 +50,39 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
+public extension Store {
+
+    func map<LocalState, LocalAction, LocalMutation>(
+        _ initialLocalState: LocalState,
+        _ stateGetter: @escaping (LocalState) -> State,
+        _ stateSetter: @escaping (inout State, LocalState) -> Void,
+        _ actionGetter: @escaping (LocalAction) -> Action,
+        _ mutationGetter: @escaping (LocalMutation) -> Mutation,
+        _ localMutationGetter: @escaping (Mutation) -> LocalMutation
+    ) -> Store<LocalState, LocalAction, LocalMutation> {
+
+        let localState = initialLocalState
+
+        let localReducer = SwiftUIRedux.map(
+            reducer.reduce,
+            stateGetter,
+            stateSetter,
+            mutationGetter
+        )
+
+        let localController = SwiftUIRedux.map(
+            controller.process,
+            stateGetter,
+            actionGetter,
+            localMutationGetter
+        )
+
+        return Store<LocalState, LocalAction, LocalMutation>(
+            state: localState,
+            reducer: Reducer(reduce: localReducer),
+            controller: StoreController(process: localController)
+        )
+
+    }
+}

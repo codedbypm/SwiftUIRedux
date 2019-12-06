@@ -16,6 +16,39 @@ public struct Reducer<State, Mutation> {
     }
 }
 
+public func map<State, Mutation, LocalState, LocalMutation>(
+    _ reducer: @escaping (inout State, Mutation) -> Void,
+    _ stateGetter: @escaping (LocalState) -> State,
+    _ stateSetter: @escaping (inout State, LocalState) -> Void,
+    _ mutationGetter: @escaping (LocalMutation) -> Mutation
+) -> (inout LocalState, LocalMutation) -> Void {
+
+    return { localState, localMutation in
+        var state = stateGetter(localState)
+        let mutation = mutationGetter(localMutation)
+
+        reducer(&state, mutation)
+        stateSetter(&state, localState)
+    }
+}
+
+public func map<Action, State, Mutation, LocalAction, LocalState, LocalMutation>(
+    _ storeController: @escaping (Action, State) -> AnyPublisher<Mutation, Never>,
+    _ stateGetter: @escaping (LocalState) -> State,
+    _ actionGetter: @escaping (LocalAction) -> Action,
+    _ localMutationGetter: @escaping (Mutation) -> LocalMutation
+) -> (LocalAction, LocalState) -> AnyPublisher<LocalMutation, Never> {
+
+    return { localAction, localState in
+        let action = actionGetter(localAction)
+        let state = stateGetter(localState)
+
+        return storeController(action, state)
+            .map { localMutationGetter($0) }
+            .eraseToAnyPublisher()
+    }
+}
+
 public func combine<State, Mutation>(
     _ reducers: [(inout State, Mutation) -> Void]
 ) -> (inout State, Mutation) -> Void {
