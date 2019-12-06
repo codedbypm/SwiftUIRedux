@@ -36,7 +36,7 @@ public func map<Action, State, Mutation, LocalAction, LocalState, LocalMutation>
     _ storeController: @escaping (Action, State) -> AnyPublisher<Mutation, Never>,
     _ stateGetter: @escaping (LocalState) -> State,
     _ actionGetter: @escaping (LocalAction) -> Action,
-    _ localMutationGetter: @escaping (Mutation) -> LocalMutation
+    _ localMutationGetter: @escaping (Mutation) -> LocalMutation?
 ) -> (LocalAction, LocalState) -> AnyPublisher<LocalMutation, Never> {
 
     return { localAction, localState in
@@ -44,7 +44,7 @@ public func map<Action, State, Mutation, LocalAction, LocalState, LocalMutation>
         let state = stateGetter(localState)
 
         return storeController(action, state)
-            .map { localMutationGetter($0) }
+            .compactMap { localMutationGetter($0) }
             .eraseToAnyPublisher()
     }
 }

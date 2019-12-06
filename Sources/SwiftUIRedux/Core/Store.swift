@@ -59,7 +59,7 @@ public extension Store {
         stateSetter: @escaping (inout State, LocalState) -> Void,
         actionGetter: @escaping (LocalAction) -> Action,
         mutationGetter: @escaping (LocalMutation) -> Mutation,
-        localMutationGetter: @escaping (Mutation) -> LocalMutation
+        localMutationGetter: @escaping (Mutation) -> LocalMutation?
     ) -> Store<LocalState, LocalAction, LocalMutation> {
 
         let localState = initialLocalState
