@@ -78,7 +78,7 @@ public extension Store {
         )
 
         return Store<LocalState, LocalAction, LocalMutation>(
-            state: localStateMapper(state),ç
+            state: localStateMapper(state),
             reducer: localReducer,
             controller: localController
         )
