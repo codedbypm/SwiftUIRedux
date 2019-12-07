@@ -9,11 +9,6 @@ import Combine
 import Foundation
 import os.log
 
-public func addressOf<T: Any>(_ o: T) -> String {
-    let addr = unsafeBitCast(o, to: Int.self)
-    return String(format: "%p", addr)
-}
-
 public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
@@ -38,12 +33,11 @@ public final class Store<State, Action, Mutation>: ObservableObject {
         self.state = state
         self.reducer = reducer
         self.controller = controller
-
-        self.objectWillChange.print().sink { _ in
-            print(addressOf(state))
-        }
     }
 
+    deinit {
+        print("deinit of \(self)")
+    }
     // MARK: - Public methods
 
     public func send(_ action: Action) {
