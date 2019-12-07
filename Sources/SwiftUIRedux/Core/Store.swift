@@ -33,6 +33,8 @@ public final class Store<State, Action, Mutation>: ObservableObject {
         self.state = state
         self.reducer = reducer
         self.controller = controller
+
+        self.objectWillChange.print().sink {}
     }
 
     // MARK: - Public methods
