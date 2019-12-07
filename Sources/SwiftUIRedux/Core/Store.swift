@@ -44,7 +44,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        controller.process(action, state)
+        controller.effect(action, state)
             .receive(on: RunLoop.main)
             .sink { self.reducer.reduce(&self.state, $0) }
             .store(in: &cancellables)
@@ -72,7 +72,7 @@ public extension Store {
         )
 
         let localController = SwiftUIRedux.map(
-            controller.process,
+            controller.effect,
             stateGetter,
             actionGetter,
             localMutationGetter
@@ -81,7 +81,7 @@ public extension Store {
         return Store<LocalState, LocalAction, LocalMutation>(
             state: localState,
             reducer: Reducer(reduce: localReducer),
-            controller: StoreController(process: localController)
+            controller: StoreController(effect: localController)
         )
 
     }
