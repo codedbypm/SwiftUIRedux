@@ -64,15 +64,13 @@ public extension Store {
 
         let localState = initialLocalState
 
-        let localReducer = SwiftUIRedux.map(
-            reducer.reduce,
+        let localReducer = reducer.map(
             stateGetter,
             stateSetter,
             mutationGetter
         )
 
-        let localController = SwiftUIRedux.map(
-            controller.effect,
+        let localController = controller.map(
             stateGetter,
             actionGetter,
             localMutationGetter
@@ -80,8 +78,8 @@ public extension Store {
 
         return Store<LocalState, LocalAction, LocalMutation>(
             state: localState,
-            reducer: Reducer(reduce: localReducer),
-            controller: StoreController(effect: localController)
+            reducer: localReducer,
+            controller: localController
         )
 
     }
