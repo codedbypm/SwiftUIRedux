@@ -15,11 +15,3 @@ public struct StoreController<State, Action, Mutation> {
         self.effect = effect
     }
 }
-
-public protocol StoreControllerProtocol {
-    associatedtype A
-    associatedtype S
-    associatedtype M
-
-    func process(_ action: A, _ state: S) -> AnyPublisher<M, Never>
-}
