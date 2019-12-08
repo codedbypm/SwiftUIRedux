@@ -60,7 +60,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 public extension Store {
 
     func map<LocalState, LocalAction, LocalMutation>(
-        localState: inout LocalState,
+        localStateMapper: @escaping (inout State) -> LocalState,
         stateGetter: @escaping (LocalState) -> State,
         stateSetter: @escaping (inout State, LocalState) -> Void,
         actionGetter: @escaping (LocalAction) -> Action,
@@ -81,7 +81,7 @@ public extension Store {
         )
 
         return Store<LocalState, LocalAction, LocalMutation>(
-            state: localState,
+            state: localStateMapper(&state),
             reducer: localReducer,
             controller: localController
         )
