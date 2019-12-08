@@ -51,9 +51,6 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             .effect(action, state)
             .print("Store")
             .receive(on: RunLoop.main)
-            .breakpoint(receiveOutput: { mutation -> Bool in
-                return true
-            })
             .sink {
                 self.reducer.reduce(&self.state, $0)
             }
