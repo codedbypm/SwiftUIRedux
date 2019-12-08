@@ -18,7 +18,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
     public var objectWillChange: ObservableObjectPublisher { _objectWillChange }
 
     public private(set) var state: State {
-        willSet {
+        didSet {
             _objectWillChange.send()
         }
     }
