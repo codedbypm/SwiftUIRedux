@@ -18,7 +18,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
     public let reducer: Reducer<State, Mutation>
 
     public private(set) var cancellables = Set<AnyCancellable>()
-
+    
     // MARK: - Private properties
 
     private let controller: StoreController<State, Action, Mutation>
@@ -47,12 +47,15 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        controller.effect(action, state)
+        controller
+            .effect(action, state)
             .receive(on: RunLoop.main)
             .breakpoint(receiveOutput: { mutation -> Bool in
                 return true
             })
-            .sink { self.reducer.reduce(&self.state, $0) }
+            .sink {
+                self.reducer.reduce(&self.state, $0)
+            }
             .store(in: &cancellables)
     }
 }
