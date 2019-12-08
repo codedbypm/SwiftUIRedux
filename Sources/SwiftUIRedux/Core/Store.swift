@@ -13,13 +13,21 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published public private(set) var state: State
+    public let reducer: Reducer<State, Mutation>
 
-    // MARK: - Private properties
+    public var objectWillChange: ObservableObjectPublisher { _objectWillChange }
+
+    public private(set) var state: State {
+        willSet {
+            _objectWillChange.send()
+        }
+    }
 
     public private(set) var cancellables = Set<AnyCancellable>()
 
-    public let reducer: Reducer<State, Mutation>
+    // MARK: - Private properties
+
+    private let _objectWillChange = ObjectWillChangePublisher()
 
     private let controller: StoreController<State, Action, Mutation>
 
