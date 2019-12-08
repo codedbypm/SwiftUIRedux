@@ -31,16 +31,16 @@ public extension Reducer {
 
     func map<LocalState, LocalMutation>(
         _ stateGetter: @escaping (LocalState) -> State,
-        _ stateSetter: @escaping (inout State, LocalState) -> Void,
+        _ localStateGetter: @escaping (State) -> LocalState,
         _ mutationGetter: @escaping (LocalMutation) -> Mutation
     ) -> Reducer<LocalState, LocalMutation> {
-
         return Reducer<LocalState, LocalMutation> { localState, localMutation in
             var state = stateGetter(localState)
             let mutation = mutationGetter(localMutation)
 
             self.reduce(&state, mutation)
-            stateSetter(&state, localState)
+
+            localState = localStateGetter(state)
         }
     }
 

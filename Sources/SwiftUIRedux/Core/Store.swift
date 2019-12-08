@@ -63,7 +63,7 @@ public extension Store {
     func map<LocalState, LocalAction, LocalMutation>(
         initialState: LocalState,
         stateGetter: @escaping (LocalState) -> State,
-        stateSetter: @escaping (inout State, LocalState) -> Void,
+        localStateGetter: @escaping (State) -> LocalState,
         actionGetter: @escaping (LocalAction) -> Action,
         mutationGetter: @escaping (LocalMutation) -> Mutation,
         localMutationGetter: @escaping (Mutation) -> LocalMutation?
@@ -71,7 +71,7 @@ public extension Store {
 
         let localReducer = reducer.map(
             stateGetter,
-            stateSetter,
+            localStateGetter,
             mutationGetter
         )
 
