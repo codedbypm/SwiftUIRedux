@@ -39,8 +39,8 @@ extension TextFieldAction: CustomStringConvertible {
 extension StoreController {
 
     public static func textFieldStoreController(
-    ) -> StoreController<TextFieldState, TextFieldAction, TextFieldMutation> {
-        return .init { action, _  in
+    ) -> StoreController<TextFieldAction, TextFieldMutation> {
+        return .init { action  in
             switch action {
             case .update(let text):
                 return

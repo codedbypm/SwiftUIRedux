@@ -21,14 +21,14 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Private properties
 
-    private let controller: StoreController<State, Action, Mutation>
+    private let controller: StoreController<Action, Mutation>
 
     // MARK: - Inits
 
     public init(
         state: State,
         reducer: Reducer<State, Mutation>,
-        controller: StoreController<State, Action, Mutation>
+        controller: StoreController<Action, Mutation>
     ) {
         self.state = state
         self.reducer = reducer
@@ -48,11 +48,9 @@ public final class Store<State, Action, Mutation>: ObservableObject {
         )
 
         controller
-            .effect(action, state)
+            .effect(action)
             .receive(on: RunLoop.main)
-            .sink {
-                self.reducer.reduce(&self.state, $0)
-            }
+            .sink { self.reducer.reduce(&self.state, $0) }
             .store(in: &cancellables)
     }
 }
@@ -77,14 +75,13 @@ public extension Store {
             localState = self.state[keyPath: localStateKeyPath]
         }
 
-
-        let localStoreController: StoreController<LocalState, LocalAction, LocalMutation> = .init { (localAction, localSstate) -> AnyPublisher<LocalMutation, Never> in
+        let localStoreController: StoreController<LocalAction, LocalMutation> = .init { (localAction) -> AnyPublisher<LocalMutation, Never> in
 
             /// Get the action
             let action: Action = actionGetter(localAction)
 
             /// Get the Publisher
-            let publisher = self.controller.effect(action, self.state)
+            let publisher = self.controller.effect(action)
 
             /// Map the publisher and return
             return publisher

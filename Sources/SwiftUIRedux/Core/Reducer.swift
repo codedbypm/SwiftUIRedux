@@ -30,9 +30,10 @@ public extension Reducer {
     }
 
     func map<LocalState, LocalMutation>(
-        _ stateGetter: @escaping (LocalState) -> State,
-        _ localStateGetter: @escaping (State) -> LocalState,
-        _ mutationGetter: @escaping (LocalMutation) -> Mutation
+        stateGetter: @escaping (LocalState) -> State,
+        stateSetter: @escaping (inout State) -> Void,
+        localStateKeyPath: WritableKeyPath<State, LocalState>,
+        mutationGetter: @escaping (LocalMutation) -> Mutation
     ) -> Reducer<LocalState, LocalMutation> {
         return Reducer<LocalState, LocalMutation> { localState, localMutation in
             var state = stateGetter(localState)
@@ -40,7 +41,10 @@ public extension Reducer {
 
             self.reduce(&state, mutation)
 
-            localState = localStateGetter(state)
+            localState = state[keyPath: localStateKeyPath]
+            state[keyPath: localStateKeyPath] = localState
+            
+            // I WAS HERE: trying to propagate the localState change to the global state
         }
     }
 
