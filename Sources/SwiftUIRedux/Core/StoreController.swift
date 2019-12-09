@@ -32,7 +32,6 @@ public extension StoreController {
             let localState = globalState[keyPath: stateKeyPath]
             return self.effect(localAction, localState)
                 .map { mutationMapper($0) }
-                .print("Pulledback")
                 .eraseToAnyPublisher()
         }
     }
@@ -49,7 +48,6 @@ public extension StoreController {
 
             return self.effect(action, state)
                 .compactMap { localMutationGetter($0) }
-                .print("Mapped")
                 .eraseToAnyPublisher()
         }
     }
@@ -64,7 +62,6 @@ public extension StoreController {
             }
 
             return publisher
-                .print("Combined")
                 .eraseToAnyPublisher()
         }
     }

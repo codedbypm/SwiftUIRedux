@@ -49,7 +49,6 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
         controller
             .effect(action, state)
-            .print("Store")
             .receive(on: RunLoop.main)
             .sink {
                 self.reducer.reduce(&self.state, $0)
@@ -62,29 +61,42 @@ public extension Store {
 
     func map<LocalState, LocalAction, LocalMutation>(
         initialState: LocalState,
-        stateGetter: @escaping (LocalState) -> State,
-        localStateGetter: @escaping (State) -> LocalState,
+        localStateKeyPath: WritableKeyPath<State, LocalState>,
         actionGetter: @escaping (LocalAction) -> Action,
         mutationGetter: @escaping (LocalMutation) -> Mutation,
         localMutationGetter: @escaping (Mutation) -> LocalMutation?
     ) -> Store<LocalState, LocalAction, LocalMutation> {
 
-        let localReducer = reducer.map(
-            stateGetter,
-            localStateGetter,
-            mutationGetter
-        )
+        let localReducer: Reducer<LocalState, LocalMutation> = .init { localState, localMutation in
+            /// Get the mutation
+            let mutation: Mutation = mutationGetter(localMutation)
 
-        let localController = controller.map(
-            stateGetter,
-            actionGetter,
-            localMutationGetter
-        )
+            /// Reduce the Store state
+            self.reducer.reduce(&self.state, mutation)
+
+            /// Change the localState
+            localState = self.state[keyPath: localStateKeyPath]
+        }
+
+
+        let localStoreController: StoreController<LocalState, LocalAction, LocalMutation> = .init { (localAction, localSstate) -> AnyPublisher<LocalMutation, Never> in
+
+            /// Get the action
+            let action: Action = actionGetter(localAction)
+
+            /// Get the Publisher
+            let publisher = self.controller.effect(action, self.state)
+
+            /// Map the publisher and return
+            return publisher
+                .compactMap { localMutationGetter($0) }
+                .eraseToAnyPublisher()
+        }
 
         return Store<LocalState, LocalAction, LocalMutation>(
             state: initialState,
             reducer: localReducer,
-            controller: localController
+            controller: localStoreController
         )
     }
 }
