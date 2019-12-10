@@ -33,21 +33,7 @@ public extension StoreController {
                 .eraseToAnyPublisher()
         }
     }
-
-    func map<LocalAction, LocalMutation>(
-        _ actionGetter: @escaping (LocalAction) -> Action,
-        _ localMutationGetter: @escaping (Mutation) -> LocalMutation?
-    ) -> StoreController<LocalAction, LocalMutation> {
-
-        return StoreController<LocalAction, LocalMutation> { localAction in
-            let action = actionGetter(localAction)
-
-            return self.effect(action)
-                .compactMap { localMutationGetter($0) }
-                .eraseToAnyPublisher()
-        }
-    }
-
+    
     static func combine<Action, Mutation>(
         _ storeControllers: [StoreController<Action, Mutation>]
     ) -> StoreController<Action, Mutation> {
