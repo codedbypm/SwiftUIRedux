@@ -9,10 +9,12 @@ import Combine
 import Foundation
 
 public struct Reducer<State, Mutation> {
-    let reduce: (inout State, Mutation) -> Void
+    public typealias Body = (inout State, Mutation) -> Void
 
-    public init(reduce: @escaping (inout State, Mutation) -> Void) {
-        self.reduce = reduce
+    public let body: Body
+
+    public init(reduce: @escaping Body) {
+        self.body = reduce
     }
 }
 
@@ -22,10 +24,10 @@ public extension Reducer {
         _ stateKeyPath: WritableKeyPath<GlobalState, State>,
         _ mutationKeyPath: KeyPath<GlobalMutation, Mutation?>
     ) -> Reducer<GlobalState, GlobalMutation> {
-        return Reducer<GlobalState, GlobalMutation> { state, mutation in
-            guard let localMutation = mutation[keyPath: mutationKeyPath] else { return }
+        return Reducer<GlobalState, GlobalMutation> { globalState, globalMutation in
+            guard let mutation = globalMutation[keyPath: mutationKeyPath] else { return }
 
-            self.reduce(&state[keyPath: stateKeyPath], localMutation)
+            self.body(&globalState[keyPath: stateKeyPath], mutation)
         }
     }
 
@@ -34,7 +36,7 @@ public extension Reducer {
     ) -> Reducer<State, Mutation> {
         return Reducer<State, Mutation> { (state, mutation) in
             reducers.forEach {
-                $0.reduce(&state, mutation)
+                $0.body(&state, mutation)
             }
         }
     }
