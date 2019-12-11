@@ -31,6 +31,18 @@ public extension Reducer {
         }
     }
 
+    func lift<GlobalState, GlobalMutation>(
+        _ lens: Lens<GlobalState, State>,
+        _ prism: Prism<GlobalMutation, Mutation>
+    ) -> Reducer<GlobalState, GlobalMutation> {
+        return Reducer<GlobalState, GlobalMutation> { globalState, globalMutation in
+            guard let mutation = prism.tryGet(globalMutation) else { return }
+            var state = lens.get(globalState)
+            self.body(&state, mutation)
+            lens.set(&globalState, state)
+        }
+    }
+
     static func combine<State, Mutation>(
         _ reducers: [Reducer<State, Mutation>]
     ) -> Reducer<State, Mutation> {
