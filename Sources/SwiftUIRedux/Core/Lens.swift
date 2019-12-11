@@ -22,7 +22,7 @@ public struct Lens<Whole, Part> {
 
 public extension Lens {
 
-    static func lens<Whole, Part>(
+    static func fromKeyPath<Whole, Part>(
         _ keyPath: WritableKeyPath<Whole, Part>
     ) -> Lens<Whole, Part> {
         return Lens<Whole, Part>(
