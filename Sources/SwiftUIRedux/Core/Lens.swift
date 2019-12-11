@@ -20,16 +20,17 @@ public struct Lens<Whole, Part> {
     }
 }
 
-public extension Lens {
+public extension WritableKeyPath {
 
-    static func fromKeyPath(
-        _ keyPath: WritableKeyPath<Whole, Part>
-    ) -> Lens {
-        return Lens<Whole, Part>(
-            get: { $0[keyPath: keyPath] },
-            set: { $0[keyPath: keyPath] = $1 }
+    var lens: Lens<Root, Value> {
+        return Lens<Root, Value>(
+            get: { $0[keyPath: self] },
+            set: { $0[keyPath: self] = $1 }
         )
     }
+}
+
+public extension Lens {
 
     static func both<PartA, PartB>(
         _ lhs: Lens<Whole, PartA>,
