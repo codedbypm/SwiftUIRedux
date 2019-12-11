@@ -22,14 +22,15 @@ public struct Lens<Whole, Part> {
 
 public extension Lens {
 
-    static func fromKeyPath(
-        _ keyPath: WritableKeyPath<Whole, Part>
-    ) -> Lens {
-        return Lens<Whole, Part>(
+    init(keyPath: WritableKeyPath<Whole, Part>) {
+        self = Lens<Whole, Part>(
             get: { $0[keyPath: keyPath] },
             set: { $0[keyPath: keyPath] = $1 }
         )
     }
+}
+
+public extension Lens {
 
     static func both<PartA, PartB>(
         _ lhs: Lens<Whole, PartA>,
