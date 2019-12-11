@@ -28,16 +28,13 @@ public extension Lens {
             set: { $0[keyPath: keyPath] = $1 }
         )
     }
-}
 
-public extension Lens {
-
-    static func both<Whole, PartA, PartB>(
+    static func both<PartA, PartB>(
         _ lhs: Lens<Whole, PartA>,
         _ rhs: Lens<Whole, PartB>
-    ) -> Lens<Whole, (PartA, PartB)> {
+    ) -> Lens<Whole, Part> where Part == (PartA, PartB) {
 
-        return Lens<Whole, (PartA, PartB)>(
+        return Lens<Whole, Part>(
             get: {
                 (lhs.get($0), rhs.get($0))
             },
