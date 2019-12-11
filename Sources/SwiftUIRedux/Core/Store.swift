@@ -58,39 +58,38 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 public extension Store {
 
     func map<LocalState, LocalAction, LocalMutation>(
-        localStateKeyPath: WritableKeyPath<State, LocalState>,
-        actionGetter: @escaping (LocalAction) -> Action,
-        mutationGetter: @escaping (LocalMutation) -> Mutation,
-        localMutationGetter: @escaping (Mutation) -> LocalMutation?
+        stateLens: Lens<State, LocalState>,
+        actionPrism: Prism<Action, LocalAction>,
+        mutationPrism: Prism<Mutation, LocalMutation>
     ) -> Store<LocalState, LocalAction, LocalMutation> {
 
         let localReducer: Reducer<LocalState, LocalMutation> = .init { localState, localMutation in
             /// Get the mutation
-            let mutation: Mutation = mutationGetter(localMutation)
+            let mutation = mutationPrism.inject(localMutation)
 
             /// Reduce the Store state
             self.reducer.body(&self.state, mutation)
 
             /// Change the localState
-            localState = self.state[keyPath: localStateKeyPath]
+            localState = stateLens.get(self.state)
         }
 
-        let localStoreController: StoreController<LocalAction, LocalMutation> = .init { (localAction) -> AnyPublisher<LocalMutation, Never> in
+        let localStoreController: StoreController<LocalAction, LocalMutation> = .init { localAction in
 
             /// Get the action
-            let action: Action = actionGetter(localAction)
+            let action = actionPrism.inject(localAction)
 
             /// Get the Publisher
             let publisher = self.controller.body(action)
 
             /// Map the publisher and return
             return publisher
-                .compactMap { localMutationGetter($0) }
+                .compactMap { mutationPrism.tryGet($0) }
                 .eraseToAnyPublisher()
         }
 
         return Store<LocalState, LocalAction, LocalMutation>(
-            state: state[keyPath: localStateKeyPath],
+            state: stateLens.get(state),
             reducer: localReducer,
             controller: localStoreController
         )
