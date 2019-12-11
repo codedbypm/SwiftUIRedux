@@ -32,7 +32,7 @@ public extension Lens {
 
 public extension Lens {
 
-    static func both<PartA, PartB>(
+    static func both<Whole, PartA, PartB>(
         _ lhs: Lens<Whole, PartA>,
         _ rhs: Lens<Whole, PartB>
     ) -> Lens<Whole, (PartA, PartB)> {
