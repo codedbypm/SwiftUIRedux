@@ -31,7 +31,7 @@ public extension Lens {
         )
     }
 
-    func Both<Whole, PartA, PartB>(
+    func both<Whole, PartA, PartB>(
         _ lhs: Lens<Whole, PartA>,
         _ rhs: Lens<Whole, PartB>
     ) -> Lens<Whole, (PartA, PartB)> {
