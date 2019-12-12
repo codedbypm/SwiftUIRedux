@@ -21,18 +21,18 @@ public struct StoreController<Action, Mutation> {
 
 public extension StoreController {
 
-    func pullback<GlobalAction, GlobalMutation>(
-        _ actionKeyPath: KeyPath<GlobalAction, Action?>,
-        _ mutationMapper: @escaping (Mutation) -> GlobalMutation
+    func lift<GlobalAction, GlobalMutation>(
+        _ actionPrism: Prism<GlobalAction, Action>,
+        _ mutationPrism:  Prism<GlobalMutation, Mutation>
     ) -> StoreController<GlobalAction, GlobalMutation> {
 
         return StoreController<GlobalAction, GlobalMutation> { globalAction in
-            guard let action = globalAction[keyPath: actionKeyPath] else {
+            guard let action = actionPrism.tryGet(globalAction) else {
                 return Empty<GlobalMutation, Never>(completeImmediately: false).eraseToAnyPublisher()
             }
 
             return self.body(action)
-                .map { mutationMapper($0) }
+                .map { mutationPrism.inject($0) }
                 .eraseToAnyPublisher()
         }
     }
