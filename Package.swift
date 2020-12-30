@@ -5,8 +5,8 @@ import PackageDescription
 let package = Package(
     name: "SwiftUI Redux",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v10_14)
+        .iOS(.v14),
+        .macOS(.v11)
     ],
     products: [
         .library(name: "SwiftUIRedux Lib", targets: ["SwiftUIRedux"])
