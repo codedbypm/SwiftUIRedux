@@ -9,21 +9,16 @@ import Combine
 import Foundation
 import os.log
 
+/// A class which owns the state  and allows modifications to it by means of actions
 public final class Store<State, Action, Mutation>: ObservableObject {
 
     // MARK: - Public properties
 
-    @Published public private(set) var state: State
+    /// The structure modeling the state
+    @Published
+    public internal(set) var state: State
 
-    public let reducer: Reducer<State, Mutation>
-
-    public private(set) var cancellables = Set<AnyCancellable>()
-
-    // MARK: - Private properties
-
-    private let controller: StoreController<Action, Mutation>
-
-    // MARK: - Inits
+    // MARK: - Init
 
     public init(
         state: State,
@@ -35,11 +30,10 @@ public final class Store<State, Action, Mutation>: ObservableObject {
         self.controller = controller
     }
 
-    deinit {
-        print("deinit of \(self)")
-    }
     // MARK: - Public methods
 
+    /// A method used to inform the store that some events that might change the state have occured.
+    /// - Parameter action: the action to send to the store
     public func send(_ action: Action) {
         os_log(
             .info,
@@ -53,45 +47,15 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             .sink { self.reducer.body(&self.state, $0) }
             .store(in: &cancellables)
     }
-}
 
-public extension Store {
+    // MARK: - Internal properties
 
-    func map<LocalState, LocalAction, LocalMutation>(
-        stateLens: Lens<State, LocalState>,
-        actionPrism: Prism<Action, LocalAction>,
-        mutationPrism: Prism<Mutation, LocalMutation>
-    ) -> Store<LocalState, LocalAction, LocalMutation> {
+    internal let reducer: Reducer<State, Mutation>
 
-        let localReducer: Reducer<LocalState, LocalMutation> = .init { localState, localMutation in
-            /// Get the mutation
-            let mutation = mutationPrism.inject(localMutation)
+    internal let controller: StoreController<Action, Mutation>
 
-            /// Reduce the Store state
-            self.reducer.body(&self.state, mutation)
+    // MARK: - Private properties
 
-            /// Change the localState
-            localState = stateLens.get(self.state)
-        }
+    private var cancellables = Set<AnyCancellable>()
 
-        let localStoreController: StoreController<LocalAction, LocalMutation> = .init { localAction in
-
-            /// Get the action
-            let action = actionPrism.inject(localAction)
-
-            /// Get the Publisher
-            let publisher = self.controller.body(action)
-
-            /// Map the publisher and return
-            return publisher
-                .compactMap { mutationPrism.tryGet($0) }
-                .eraseToAnyPublisher()
-        }
-
-        return Store<LocalState, LocalAction, LocalMutation>(
-            state: stateLens.get(state),
-            reducer: localReducer,
-            controller: localStoreController
-        )
-    }
 }
