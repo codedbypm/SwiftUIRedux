@@ -29,7 +29,7 @@ public struct Lens<Whole, Part> {
 
     /// Init a `Lens` using a keypath.
     /// - Parameter keyPath: the keypath indentifiying the `Part`
-    init(keyPath: WritableKeyPath<Whole, Part>) {
+    public init(keyPath: WritableKeyPath<Whole, Part>) {
         self = Lens<Whole, Part>(
             get: { $0[keyPath: keyPath] },
             set: { $0[keyPath: keyPath] = $1 }
