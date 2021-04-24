@@ -13,7 +13,6 @@ let package = Package(
     ],
     targets: [
         .target(name: "SwiftUIRedux"),
-        .testTarget(name: "SwiftUIRedux Tests", dependencies: ["SwiftUIRedux"])
     ],
     swiftLanguageVersions: [.v5]
 )
