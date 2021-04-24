@@ -1,8 +1,6 @@
 //
-//  File.swift
-//  
-//
-//  Created by Paolo Moroni on 16/11/2019.
+// Project:  SwiftUIRedux
+// Copyright © 2021 codedby.pm. All rights reserved.
 //
 
 import Combine
