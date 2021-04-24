@@ -7,7 +7,7 @@ import Foundation
 
 public extension Store {
 
-    /// A method that transforms the receiver into a new store responsible for a portion of the receiver's `state`
+    /// A function that returns a store responsible for only a portion of the state handled by the receiver.
     /// - Parameters:
     ///   - stateLens: the `Lens` used to derive `LocalState` from `State`
     ///   - actionPrism: the `Prism` used to get `LocalAction` from `Acion` or to transform a
@@ -15,7 +15,7 @@ public extension Store {
     ///   - mutationPrism: the `Prism` used to get `LocalMutation` from `Mutation` or to transform a
     ///    `LocalMutation` into  a `Mutation`.
     /// - Returns: a new `Store` object operating on `LocalState`.
-    func map<LocalState, LocalAction, LocalMutation>(
+    func view<LocalState, LocalAction, LocalMutation>(
         stateLens: Lens<State, LocalState>,
         actionPrism: Prism<Action, LocalAction>,
         mutationPrism: Prism<Mutation, LocalMutation>
