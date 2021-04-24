@@ -33,13 +33,13 @@ public extension Store {
             localState = stateLens.get(self.state)
         }
 
-        let localStoreController: StoreController<LocalAction, LocalMutation>
+        let localStoreController: Reactor<LocalAction, LocalMutation>
         localStoreController = .init { localAction in
             /// Get the action
             let action = actionPrism.inject(localAction)
 
             /// Get the Publisher
-            let publisher = self.controller.body(action)
+            let publisher = self.reactor.reaction(action)
 
             /// Map the publisher and return
             return publisher

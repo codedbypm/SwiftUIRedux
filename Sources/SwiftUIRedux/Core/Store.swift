@@ -21,11 +21,11 @@ public final class Store<State, Action, Mutation>: ObservableObject {
     public init(
         state: State,
         reducer: Reducer<State, Mutation>,
-        controller: StoreController<Action, Mutation>
+        controller: Reactor<Action, Mutation>
     ) {
         self.state = state
         self.reducer = reducer
-        self.controller = controller
+        self.reactor = controller
     }
 
     // MARK: - Public methods
@@ -39,8 +39,8 @@ public final class Store<State, Action, Mutation>: ObservableObject {
             "Action: %@", String(describing: action)
         )
 
-        controller
-            .body(action)
+        reactor
+            .reaction(action)
             .receive(on: RunLoop.main)
             .sink { self.reducer.body(&self.state, $0) }
             .store(in: &cancellables)
@@ -50,7 +50,7 @@ public final class Store<State, Action, Mutation>: ObservableObject {
 
     internal let reducer: Reducer<State, Mutation>
 
-    internal let controller: StoreController<Action, Mutation>
+    internal let reactor: Reactor<Action, Mutation>
 
     // MARK: - Private properties
 
